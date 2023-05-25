@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt');
 const userModel = require('../Models/UserModel');
-const UserModel = require('../Models/UserModel');
 
 async function getList(req, res) {
     try {

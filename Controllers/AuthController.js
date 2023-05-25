@@ -1,51 +1,65 @@
-const userModel = require('../Models/UserModel');
-const bcrypt = require('bcrypt');
 const jsonwebtoken = require('jsonwebtoken');
+const userModel = require('../Models/UserModel');
+const responseHandler = require('../Handlers/response.handler')
 
 const register = async (req, res) => {
     try {
-        const { username, password, email } = req.body
-        await userModel.create({
-            username: username,
-            password: bcrypt.hashSync(password, 10),
-            email: email,
-            role: 'regular'
+        const { username, password, displayName } = req.body
+
+        const checkUser = await userModel.findOne({ username })
+
+        if (checkUser) return responseHandler.badRequest(res, "Username already used")
+
+        const user = new userModel()
+
+        user.username = username
+        user.displayName = displayName
+        user.setPassword(password)
+        await user.save()
+
+        const token = jsonwebtoken.sign({
+            id: user.id
+        }, process.env.SECRET_JWT, {
+            expiresIn: 36000
         })
-        console.log('success register');
-        return res.status(200).send('register here')
+        const data = {
+            token,
+            ...user._doc,
+            id: user.id
+        }
+
+        responseHandler.created(res, data)
     } catch (error) {
-        console.log('error: ' + error);
-        return res.status(402).send('register failed: ' + error)
+        responseHandler.error(req)
     }
 }
 
 const login = async (req, res) => {
     try {
-        const { email, password } = req.body
-        const user = await userModel.findOne({ email: email });
+        const { username, password } = req.body
 
-        if (!user) {
-            return res.status(400).send('Invalid email or password')
-        }
-        if (!bcrypt.compareSync(password, user.password)) {
-            return res.status(400).send('Login failed')
-        }
+        const user = await userModel.findOne({ username: username }).select("username password salt id displayName");
+        
+        if(!user) return responseHandler.badRequest(res, "Account does not exist")
+        if(!user.validPassword(password)) return responseHandler.badRequest(res, "Incorrect password")
 
-        const jwt = jsonwebtoken.sign({
-            _id: user.id,
-            username: user.username,
-            email: user.email,
-            role: user.role
+       
+        const token = jsonwebtoken.sign({
+            id: user.id
         }, process.env.SECRET_JWT, {
             expiresIn: 36000
         })
+        user.password = undefined
+        user.salt = undefined
+        const data = {
+            token,
+            ...user._doc,
+            id: user.id
+        }
 
-        return res.status(200).send({
-            accessToken: jwt
-        });
+        responseHandler.created(res, data)
     } catch (error) {
-        console.log('error: ' + error);
-        return res.status(402).send('login failed: ' + error)
+        responseHandler.error(req)
     }
 }
 

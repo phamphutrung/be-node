@@ -4,16 +4,53 @@ const crypto = require('crypto')
 const modelOptions = require('./model.options.js')
 
 
-const UserSchema = new mongoose.Schema({
-    username: String,
-    email: {
+const userSchema = new mongoose.Schema({
+    username: {
         type: String,
+        required: true,
         unique: true
     },
-    password: String,
+    displayName: {
+        type: String,
+        required: true,
+    },
+    password: {
+        type: String,
+        required: true,
+        select: false
+    },
+    salt: {
+        type: String,
+        required: true,
+        select: false
+    },
     role: String
-})
+}, modelOptions)
 
-const UserModel = mongoose.model('User', UserSchema)
+userSchema.methods.setPassword = function (password) {
+    this.salt = crypto.randomBytes(16).toString("hex")
+
+    this.password = crypto.pbkdf2Sync(
+        password,
+        this.salt,
+        1000,
+        64,
+        "sha512"
+    ).toString("hex");
+}
+
+userSchema.methods.validPassword = function (password) {
+    const hash = this.password = crypto.pbkdf2Sync(
+        password,
+        this.salt,
+        1000,
+        64,
+        "sha512"
+    ).toString("hex");
+
+    return this.password === hash
+}
+
+const UserModel = mongoose.model('User', userSchema)
 
 module.exports = UserModel

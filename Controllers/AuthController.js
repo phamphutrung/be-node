@@ -30,7 +30,7 @@ const register = async (req, res) => {
 
         responseHandler.created(res, data)
     } catch (error) {
-        responseHandler.error(req)
+        responseHandler.error(req, error.message)
     }
 }
 
@@ -39,11 +39,10 @@ const login = async (req, res) => {
         const { username, password } = req.body
 
         const user = await userModel.findOne({ username: username }).select("username password salt id displayName");
-        
-        if(!user) return responseHandler.badRequest(res, "Account does not exist")
-        if(!user.validPassword(password)) return responseHandler.badRequest(res, "Incorrect password")
 
-       
+        if (!user) return responseHandler.badRequest(res, "Account does not exist")
+        if (!user.validPassword(password)) return responseHandler.badRequest(res, "Incorrect password")
+
         const token = jsonwebtoken.sign({
             id: user.id
         }, process.env.SECRET_JWT, {
@@ -59,11 +58,40 @@ const login = async (req, res) => {
 
         responseHandler.created(res, data)
     } catch (error) {
-        responseHandler.error(req)
+        responseHandler.error(req, error.message)
+    }
+}
+
+const updatePassword = async (req, res) => {
+    try {
+        const { password, newPassword } = req.body
+        const user = await userModel.findById(req.user.id).select("password id salt")
+
+        if (!user.validPassword(password)) return responseHandler.badRequest(res, "Incorrect password")
+        user.setPassword(newPassword)
+        await user.save()
+
+        return responseHandler.success(res)
+    } catch (error) {
+        responseHandler.error(res, error.message)
+    }
+}
+
+const getInfo = async (req, res) => {
+    try {
+        const user = await userModel.findById(req.user.id)
+
+        if (!user) return responseHandler.notFound(res)
+
+        return responseHandler.success(res, user)
+    } catch (error) {
+        responseHandler.error(res, error.message)
     }
 }
 
 module.exports = {
     register,
-    login
+    login,
+    updatePassword,
+    getInfo
 }

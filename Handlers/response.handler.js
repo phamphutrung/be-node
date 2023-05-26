@@ -1,8 +1,8 @@
 const responseWithData = (res, statusCode, data) => res.status(statusCode).json(data)
 
-const error = (res) => responseWithData(res, 500, {
+const error = (res, message) => responseWithData(res, 500, {
     status: 500,
-    message: "Opps! Something worng!"
+    message: message || "Opps! Something worng!"
 })
 
 const badRequest = (res, message) => responseWithData(res, 400, {

@@ -40,7 +40,7 @@ userSchema.methods.setPassword = function (password) {
 }
 
 userSchema.methods.validPassword = function (password) {
-    const hash = this.password = crypto.pbkdf2Sync(
+    const hash = crypto.pbkdf2Sync(
         password,
         this.salt,
         1000,
@@ -51,6 +51,6 @@ userSchema.methods.validPassword = function (password) {
     return this.password === hash
 }
 
-const UserModel = mongoose.model('User', userSchema)
+const userModel = mongoose.model('User', userSchema)
 
-module.exports = UserModel
+module.exports = userModel

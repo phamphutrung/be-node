@@ -14,10 +14,6 @@ const reviewSchema = new mongoose.Schema({
     },
     mediaType: {
         type: String,
-        required: true,
-    },
-    mediaType: {
-        type: String,
         enum: ["tv", "movie"],
         required: true
     },

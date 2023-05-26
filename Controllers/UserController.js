@@ -30,7 +30,7 @@ async function deleteUser(req, res) {
     try {
         const { id } = req.params
         console.log(id);
-        const deletedUser = await UserModel.findByIdAndDelete(id);
+        const deletedUser = await userModel.findByIdAndDelete(id);
         if (deletedUser) {
             return res.status(201).send('Delete successfully');
         } else {

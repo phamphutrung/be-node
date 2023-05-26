@@ -13,14 +13,12 @@ app.use(cookieParser()) // To interact with cookies
 require('dotenv/config')
 
 const userRouter = require('./Router/UserRoute');
-const authRouter = require('./Router/AuthRoute');
 
 // connect database
 connectDB()
 
 // middleware route
-app.use('/auth/admin', userRouter);
-app.use('/api/auth', authRouter);
+app.use('/api/users', userRouter);
 
 app.listen(process.env.PORT_SERVER || 5000, function (params) {
     console.log('running is port ' + process.env.PORT_SERVER);

@@ -1,19 +1,22 @@
 const express = require('express')
 const router = express.Router()
 
-const tokenMiddleware = require('../Middlewares/token.middleware')
-const authController = require('../Controllers/AuthController')
+const authMiddleware = require('../Middlewares/authMiddleware')
+const userController = require('../Controllers/UserController')
 
-router.post('/register', authController.register)
+router.get('/user', [
+    authMiddleware.isAuthentication,
+], userController.getList)
 
-router.post('/login', authController.login)
+router.post('/user', [
+    authMiddleware.isAuthentication,
+    authMiddleware.isAdmin,
+], userController.create)
 
-router.post('/update-password', [
-    tokenMiddleware.auth
-], authController.updatePassword)
+router.delete('/user/:id', [
+    authMiddleware.isAuthentication,
+    authMiddleware.isAdmin,
+], userController.deleteUser)
 
-router.get('/info', [
-    tokenMiddleware.auth
-], authController.getInfo)
 
 module.exports = router

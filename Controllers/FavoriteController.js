@@ -1,7 +1,7 @@
 const responseHandler = require('../Handlers/response.handler')
 const favoriteModel = require('../Models/FavoriteModel')
 
-const add = async (req, res) => {
+const create = async (req, res) => {
     try {
         const isFavorite = favoriteModel.findOne({ user: req.user.id, mediaId: req.body.id })
 
@@ -48,5 +48,6 @@ const getFavoritesOfUser = async (req, res) => {
     }
 }
 
-export default { add, remove, getFavoritesOfUser }
-
+module.exports = {
+    getFavoritesOfUser, remove, create
+}

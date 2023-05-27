@@ -3,6 +3,7 @@ const cors = require('cors');
 const connectDB = require('./Services/ConnectDbService');
 const express = require('express');
 const cookieParser = require('cookie-parser');
+const routers = require('./Routers');
 
 const app = express(); 
 app.use(cors()); //middleware cors apply all request
@@ -12,13 +13,12 @@ app.use(cookieParser()) // To interact with cookies
 
 require('dotenv/config')
 
-const userRouter = require('./Router/UserRoute');
 
 // connect database
 connectDB()
 
-// middleware route
-app.use('/api/users', userRouter);
+// middleware routers
+app.use('/api/v1/', routers);
 
 app.listen(process.env.PORT_SERVER || 5000, function (params) {
     console.log('running is port ' + process.env.PORT_SERVER);

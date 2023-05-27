@@ -1,4 +1,4 @@
-import tmdbConfig from "./tmdb.config"
+const tmdbConfig = require("./tmdb.config")
 
 const tmdbEndpoint = () => {
     mediaList: ({ mediaType, mediaCategory, page }) => tmdbConfig.getUrl(`${mediaType}/${mediaCategory}`, page)
@@ -7,9 +7,9 @@ const tmdbEndpoint = () => {
     mediaVideos: ({ mediaType, mediaId }) => tmdbConfig.getUrl(`${mediaType}/${mediaId}/videos`)
     mediaRecommend: ({ mediaType, mediaId }) => tmdbConfig.getUrl(`${mediaType}/${mediaId}/recommendations`)
     mediaImages: ({ mediaType, mediaId }) => tmdbConfig.getUrl(`${mediaType}/${mediaId}/images`)
-    mediaSearch: ({ mediaType, query, page}) => tmdbConfig.getUrl(`search/${mediaType}`, { query, page })
-    personMedias: ({ personId}) => tmdbConfig.getUrl(`person/${personId}/combined_credits`)
+    mediaSearch: ({ mediaType, query, page }) => tmdbConfig.getUrl(`search/${mediaType}`, { query, page })
+    personMedias: ({ personId }) => tmdbConfig.getUrl(`person/${personId}/combined_credits`)
 }
 
 
-export default tmdbEndpoint
+module.exports = tmdbEndpoint

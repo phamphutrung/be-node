@@ -4,4 +4,4 @@ const getUrl = (endpoint, params) => {
     return `${process.TMDB_BASE_URL}${endpoint}?key_api=${process.KEY}&${qs}`
 }
 
-export default {getUrl}
+module.exports  = {getUrl}

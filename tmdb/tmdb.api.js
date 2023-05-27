@@ -1,5 +1,5 @@
-import axiosClient from "../axios/axiosClient";
-import tmdbEndpoint from "./tmdbEndpoint";
+const axiosClient = require("../axios/axiosClient")
+const tmdbEndpoint = require("./tmdbEndpoint");
 
 const tmdbApi = () => {
     mediaList: async ({ mediaType, mediaCategory, page }) => await axiosClient.get(tmdbEndpoint.mediaList({ mediaType, mediaCategory, page }))
@@ -12,4 +12,4 @@ const tmdbApi = () => {
     personMedias: async ({ personId }) => await axiosClient.get(tmdbEndpoint.personMedias(`person/${personId}/combined_credits`))
 }
 
-export default tmdbApi
+module.exports = tmdbApi

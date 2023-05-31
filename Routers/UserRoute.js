@@ -6,20 +6,20 @@ const tokenMiddleware = require('../Middlewares/token.middleware')
 const userController = require('../Controllers/UserController')
 const favoriteController = require('../Controllers/FavoriteController')
 
-const userModel = require('../Models/UserModel')
 
 const router = express.Router()
 
 router.post('/register',
 
     [
-        body("username").isLength({ min: 4 }).withMessage("username minimum characters")
-            .custom(async value => {
-                const user = await userModel.findOne({ username: value });
-                if (user) return Promise.reject("username already used");
-            }),
+        body("username").isLength({ min: 4 }).withMessage("username minimum characters"),
         body("password").isLength({ min: 6 }).withMessage("password minimum characters"),
         body("displayName").isLength({ min: 4 }).withMessage("display name minimum characters"),
+        body("confirmPassword").exists().withMessage("confirm password is required").isLength({ min: 6 }).withMessage("confirm password minimum characters")
+            .custom((value, { req }) => {
+                if (value !== req.body.password) throw new Error('confirm password not match')
+                return true
+            }),
         requestHandler.validate,
         userController.register
     ]
@@ -77,7 +77,7 @@ router.post('/favorites',
     ]
 )
 
-router.delete('/favorites/:favoriteId', 
+router.delete('/favorites/:favoriteId',
     [
         tokenMiddleware.auth,
         favoriteController.remove
